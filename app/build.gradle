@@ -29,7 +29,8 @@ dependencies {
     implementation 'com.android.support:appcompat-v7:27.1.1'
     implementation 'com.android.support:design:27.1.1'
     implementation 'com.theah64.materialcolors:materialcolors:1.0.0'
-    implementation 'uk.co.chrisjenx:calligraphy:2.3.0'
+    implementation 'io.github.inflationx:calligraphy3:3.0.0'
+    implementation 'io.github.inflationx:viewpump:1.0.0'
     implementation 'com.snatik:storage:2.1.0'
     implementation 'com.karumi:dexter:4.2.0'
 
