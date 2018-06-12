@@ -20,7 +20,6 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:textColor="@color/black"
-            fontPath="fonts/Google-Sans.ttf"
             android:textSize="18sp"
             android:text="@string/app_name"/>
 

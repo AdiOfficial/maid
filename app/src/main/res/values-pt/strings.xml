@@ -5,4 +5,5 @@
     <string name="permission_required">A doméstica não pode limpar suas coisas sem permissão…</string>
     <string name="settings">Configurações</string>
     <string name="all_clean">Tudo limpo!</string>
+    <string name="without_permission">Permissão não concebida</string>
 </resources>
