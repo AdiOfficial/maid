@@ -64,7 +64,7 @@ class MainActivity : AppCompatActivity() {
         if (hasKillingPermission()) {
             val activityManager = getSystemService(Activity.ACTIVITY_SERVICE) as ActivityManager
             activityManager.killBackgroundProcesses("com.whatsapp")
-            showSuccessSnackbar(R.string.whatsapp_unbuged)
+            showSuccessSnackbar(R.string.whatsapp_finished)
         } else {
             showPermissionNotGrantedSnackbar(view)
         }

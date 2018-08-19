@@ -2,10 +2,10 @@
 <resources>
     <string name="app_name">Maid</string>
     <string name="clean_it_up">Clean it up!</string>
-    <string name="unbug_whatsapp">Unbug WhatsApp</string>
+    <string name="finish_whatsapp">Finish WhatsApp!</string>
     <string name="permission_required">The maid can\'t clean your stuff without permission…</string>
     <string name="settings">Settings</string>
     <string name="all_clean">All clean!</string>
-    <string name="whatsapp_unbuged">WhatsApp unbuged!</string>
+    <string name="whatsapp_finished">WhatsApp finished!</string>
     <string name="without_permission">Permission not granted</string>
 </resources>
