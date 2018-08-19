@@ -14,11 +14,11 @@ import android.net.Uri
 import android.support.v4.app.ActivityCompat
 import android.provider.Settings
 import com.ajts.androidmads.fontutils.FontUtils
+import com.chrisplus.rootmanager.RootManager
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import com.karumi.dexter.listener.multi.SnackbarOnAnyDeniedMultiplePermissionsListener
 import kotlinx.android.synthetic.main.activity_main.*
-import android.app.Activity
-import android.app.ActivityManager
+import java.io.DataOutputStream
 
 class MainActivity : AppCompatActivity() {
     private lateinit var storage: Storage
@@ -35,12 +35,24 @@ class MainActivity : AppCompatActivity() {
         val typeface = Typeface.createFromAsset(assets, "fonts/Google-Sans-Bold.ttf")
         FontUtils().applyFontToView(toolbar_title, typeface)
 
+        checkRoot()
+
         Dexter.withActivity(this)
             .withPermissions(
                 Manifest.permission.WRITE_EXTERNAL_STORAGE,
                 Manifest.permission.KILL_BACKGROUND_PROCESSES
             ).withListener(getPermissionListener())
             .check()
+    }
+
+    private fun checkRoot() {
+        if (RootManager.getInstance().hasRooted()) {
+            if (!RootManager.getInstance().obtainPermission()) {
+                showSnackbarWithTryAgain(R.string.without_superuser_permission, ::checkRoot)
+            }
+        } else {
+            showSnackbarWithTryAgain(R.string.has_no_root, ::checkRoot)
+        }
     }
 
     private fun getPermissionListener(): MultiplePermissionsListener {
@@ -56,17 +68,27 @@ class MainActivity : AppCompatActivity() {
             storage.deleteDirectory(directory)
             showSuccessSnackbar(R.string.all_clean)
         } else {
-            showPermissionNotGrantedSnackbar(view)
+            showSnackbarWithSettingsRedirection()
         }
     }
 
     fun unbugWhatsApp(view: View) {
         if (hasKillingPermission()) {
-            val activityManager = getSystemService(Activity.ACTIVITY_SERVICE) as ActivityManager
-            activityManager.killBackgroundProcesses("com.whatsapp")
-            showSuccessSnackbar(R.string.whatsapp_finished)
+            if (RootManager.getInstance().obtainPermission()) {
+                val suProcess = Runtime.getRuntime().exec("su")
+                val os = DataOutputStream(suProcess.outputStream)
+
+                os.writeBytes("adb shell\n")
+                os.flush()
+                os.writeBytes("am force-stop com.whatsapp\n")
+                os.flush()
+
+                showSuccessSnackbar(R.string.whatsapp_finished)
+            } else {
+                showSnackbarWithTryAgain(R.string.without_superuser_permission) { unbugWhatsApp(view) }
+            }
         } else {
-            showPermissionNotGrantedSnackbar(view)
+            showSnackbarWithSettingsRedirection()
         }
     }
 
@@ -91,18 +113,28 @@ class MainActivity : AppCompatActivity() {
     // the snackbar shown is similar to SnackbarOnDeniedPermissionListener, so
     // the setAction callback code was taken from withOpenSettingsButton method
 
-    private fun showPermissionNotGrantedSnackbar(view: View) {
+    private fun showSnackbarWithSettingsRedirection() {
         Snackbar.make(
                 findViewById(android.R.id.content),
                 resources.getString(R.string.without_permission),
                 5000
         ).setAction(resources.getString(R.string.settings)) {
-            val context = view.context
+            val context = baseContext
             val myAppSettings = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
                     Uri.parse("package:" + context.packageName))
             myAppSettings.addCategory(Intent.CATEGORY_DEFAULT)
             myAppSettings.flags = Intent.FLAG_ACTIVITY_NEW_TASK
             context.startActivity(myAppSettings)
+        }.show()
+    }
+
+    private fun showSnackbarWithTryAgain(resource: Int, tryAgainFunction: () -> Unit) {
+        Snackbar.make(
+                findViewById(android.R.id.content),
+                resources.getString(resource),
+                5000
+        ).setAction(resources.getString(R.string.try_again)) {
+            tryAgainFunction()
         }.show()
     }
 }

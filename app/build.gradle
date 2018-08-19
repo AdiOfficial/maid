@@ -32,6 +32,7 @@ dependencies {
     implementation 'com.ajts.androidmads.fontutils:fontutils:1.0.1'
     implementation 'com.snatik:storage:2.1.0'
     implementation 'com.karumi:dexter:4.2.0'
+    implementation 'com.chrisplus.rootmanager:library:2.0.5@aar'
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'

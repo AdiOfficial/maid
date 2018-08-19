@@ -5,7 +5,10 @@
     <string name="finish_whatsapp">Finish WhatsApp!</string>
     <string name="permission_required">The maid can\'t clean your stuff without permission…</string>
     <string name="settings">Settings</string>
+    <string name="try_again">Try again</string>
     <string name="all_clean">All clean!</string>
     <string name="whatsapp_finished">WhatsApp finished!</string>
+    <string name="has_no_root">Seems like your device has no root…</string>
     <string name="without_permission">Permission not granted</string>
+    <string name="without_superuser_permission">Superuser permission not granted</string>
 </resources>

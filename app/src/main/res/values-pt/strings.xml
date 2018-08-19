@@ -5,7 +5,10 @@
     <string name="finish_whatsapp">Finalize o WhatsApp!</string>
     <string name="permission_required">A doméstica não pode limpar suas coisas sem permissão…</string>
     <string name="settings">Configurações</string>
+    <string name="try_again">Tentar novamente</string>
     <string name="all_clean">Tudo limpo!</string>
     <string name="whatsapp_finished">WhatsApp finalizado!</string>
+    <string name="has_no_root">Parece que seu dispositivo não é rooteado…</string>
     <string name="without_permission">Permissão não concebida</string>
+    <string name="without_superuser_permission">Permissão de superuser não concebida</string>
 </resources>
