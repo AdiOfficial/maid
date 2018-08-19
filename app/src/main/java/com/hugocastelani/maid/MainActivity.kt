@@ -7,8 +7,6 @@ import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.view.View
 import com.karumi.dexter.Dexter
-import com.karumi.dexter.listener.single.PermissionListener
-import com.karumi.dexter.listener.single.SnackbarOnDeniedPermissionListener
 import com.snatik.storage.Storage
 import android.content.pm.PackageManager
 import android.graphics.Typeface
@@ -16,8 +14,11 @@ import android.net.Uri
 import android.support.v4.app.ActivityCompat
 import android.provider.Settings
 import com.ajts.androidmads.fontutils.FontUtils
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener
+import com.karumi.dexter.listener.multi.SnackbarOnAnyDeniedMultiplePermissionsListener
 import kotlinx.android.synthetic.main.activity_main.*
-
+import android.app.Activity
+import android.app.ActivityManager
 
 class MainActivity : AppCompatActivity() {
     private lateinit var storage: Storage
@@ -35,13 +36,15 @@ class MainActivity : AppCompatActivity() {
         FontUtils().applyFontToView(toolbar_title, typeface)
 
         Dexter.withActivity(this)
-            .withPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-            .withListener(getPermissionListener())
+            .withPermissions(
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.KILL_BACKGROUND_PROCESSES
+            ).withListener(getPermissionListener())
             .check()
     }
 
-    private fun getPermissionListener(): PermissionListener {
-        return SnackbarOnDeniedPermissionListener.Builder
+    private fun getPermissionListener(): MultiplePermissionsListener {
+        return SnackbarOnAnyDeniedMultiplePermissionsListener.Builder
             .with(findViewById(android.R.id.content), resources.getString(R.string.permission_required))
             .withOpenSettingsButton(resources.getString(R.string.settings))
             .withDuration(8000)
@@ -49,40 +52,57 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun cleanIt(view: View) {
-        if (hasPermission()) {
+        if (hasWritingPermission()) {
             storage.deleteDirectory(directory)
-
-            Snackbar.make(
-                findViewById(android.R.id.content),
-                resources.getString(R.string.all_clean),
-                3000
-            ).show()
-
+            showSuccessSnackbar(R.string.all_clean)
         } else {
-
-            // the snackbar below is similar to SnackbarOnDeniedPermissionListener, so
-            // the setAction callback code was taken from withOpenSettingsButton method
-
-            Snackbar.make(
-                findViewById(android.R.id.content),
-                resources.getString(R.string.without_permission),
-                5000
-            ).setAction(
-                resources.getString(R.string.settings),
-                {
-                    val context = view.context
-                    val myAppSettings = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-                            Uri.parse("package:" + context.packageName))
-                    myAppSettings.addCategory(Intent.CATEGORY_DEFAULT)
-                    myAppSettings.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                    context.startActivity(myAppSettings)
-                }
-            ).show()
+            showPermissionNotGrantedSnackbar(view)
         }
     }
 
-    private fun hasPermission(): Boolean {
+    fun unbugWhatsApp(view: View) {
+        if (hasKillingPermission()) {
+            val activityManager = getSystemService(Activity.ACTIVITY_SERVICE) as ActivityManager
+            activityManager.killBackgroundProcesses("com.whatsapp")
+            showSuccessSnackbar(R.string.whatsapp_unbuged)
+        } else {
+            showPermissionNotGrantedSnackbar(view)
+        }
+    }
+
+    private fun hasWritingPermission(): Boolean {
         val permission = Manifest.permission.WRITE_EXTERNAL_STORAGE
         return ActivityCompat.checkSelfPermission(baseContext, permission) == PackageManager.PERMISSION_GRANTED
+    }
+
+    private fun hasKillingPermission(): Boolean {
+        val permission = Manifest.permission.KILL_BACKGROUND_PROCESSES
+        return ActivityCompat.checkSelfPermission(baseContext, permission) == PackageManager.PERMISSION_GRANTED
+    }
+
+    private fun showSuccessSnackbar(resource: Int) {
+        Snackbar.make(
+                findViewById(android.R.id.content),
+                resources.getString(resource),
+                3000
+        ).show()
+    }
+
+    // the snackbar shown is similar to SnackbarOnDeniedPermissionListener, so
+    // the setAction callback code was taken from withOpenSettingsButton method
+
+    private fun showPermissionNotGrantedSnackbar(view: View) {
+        Snackbar.make(
+                findViewById(android.R.id.content),
+                resources.getString(R.string.without_permission),
+                5000
+        ).setAction(resources.getString(R.string.settings)) {
+            val context = view.context
+            val myAppSettings = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                    Uri.parse("package:" + context.packageName))
+            myAppSettings.addCategory(Intent.CATEGORY_DEFAULT)
+            myAppSettings.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            context.startActivity(myAppSettings)
+        }.show()
     }
 }

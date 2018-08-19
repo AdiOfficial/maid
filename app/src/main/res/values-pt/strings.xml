@@ -2,8 +2,10 @@
 <resources>
     <string name="app_name">Doméstica</string>
     <string name="clean_it_up">Passa a vassoura!</string>
+    <string name="unbug_whatsapp">Desbugue o WhatsApp</string>
     <string name="permission_required">A doméstica não pode limpar suas coisas sem permissão…</string>
     <string name="settings">Configurações</string>
     <string name="all_clean">Tudo limpo!</string>
+    <string name="whatsapp_unbuged">WhatsApp desbugado!</string>
     <string name="without_permission">Permissão não concebida</string>
 </resources>
